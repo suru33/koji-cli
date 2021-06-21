@@ -9,11 +9,15 @@ def latest_build_info(session, search_result, arch):
     builds = session.listBuilds(pkg_id, state=1)
     latest = max(builds, key=lambda i: i['build_id'])
     latest_rpms = session.listBuildRPMs(latest['build_id'])
-    result = filter(lambda b: b['arch'] == arch, latest_rpms)
+    result = list(filter(lambda b: b['arch'] == arch, latest_rpms))
 
     if not result:
-        result = filter(lambda b: b['arch'] == 'src', latest_rpms)
+        print(f'No builds found for {arch}, switching to "noarch"')
+        arch = 'noarch'
+        result = filter(lambda b: b['arch'] == arch, latest_rpms)
 
+    print(f'\nBuild list for "{arch}":')
+    print("===========================")
     for i in result:
         print(i['name'])
 
