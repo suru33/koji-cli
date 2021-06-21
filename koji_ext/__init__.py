@@ -1,13 +1,7 @@
 import koji
 
-tag = "ImageMagick"
-arch = 'aarch64'
 
-session = koji.ClientSession("https://koji.fedoraproject.org/kojihub")
-search_results = session.search(tag, 'package', 'glob')
-
-
-def latest_build_info(search_result):
+def latest_build_info(session, search_result, arch):
     pkg_name = search_result['name']
     pkg_id = search_result['id']
 
@@ -24,8 +18,12 @@ def latest_build_info(search_result):
         print(i['name'])
 
 
-if search_results:
-    for r in search_results:
-        latest_build_info(r)
-else:
-    print(f"Package: {tag} not found!")
+def search(tag, arch):
+    session = koji.ClientSession("https://koji.fedoraproject.org/kojihub")
+    search_results = session.search(tag, 'package', 'glob')
+
+    if search_results:
+        for result in search_results:
+            latest_build_info(session, result, arch)
+    else:
+        print(f"Package: {tag} not found!")
